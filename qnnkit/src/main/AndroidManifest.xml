@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Consumers inherit these via manifest merge, so an app that adds qnnkit
+         gets NPU access without editing its own manifest:
+         - extractNativeLibs: the Hexagon skels must live on disk (not zip-compressed
+           in the APK) so the CDSP can load them via ADSP_LIBRARY_PATH.
+         - uses-native-library: API 31+ gates access to the vendor FastRPC libs
+           that QNN needs to reach the Hexagon NPU. -->
+    <application android:extractNativeLibs="true">
+        <uses-native-library android:name="libcdsprpc.so" android:required="false"/>
+        <uses-native-library android:name="libadsprpc.so" android:required="false"/>
+    </application>
+</manifest>

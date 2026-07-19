@@ -1,0 +1,12 @@
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+.cxx/
+
+# Qualcomm QNN SDK content - proprietary, NOT redistributed here.
+# Populate it from a local QAIRT SDK: ./tools/fetch-qnn-sdk.sh
+qnnkit/src/main/cpp/include/
+qnnkit/src/main/cpp/qnn/
+qnnkit/src/main/jniLibs/
