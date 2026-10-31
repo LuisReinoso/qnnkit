@@ -16,6 +16,7 @@ file(GLOB QNN_UTIL_SRC
 
 add_library(qnnkit SHARED
   qnn_jni.cpp
+  qnn_session.cpp
   ${QNN_UTIL_SRC})
 
 target_include_directories(qnnkit PRIVATE

@@ -38,13 +38,13 @@ public final class SocInfo {
 
   /**
    * Maps a Build.SOC_MODEL string to a QNN SoC id. Only SM8450 (Snapdragon 8 Gen 1,
-   * Galaxy S22, Hexagon v73) is verified; other chips fall back to 0 (auto-detect).
+   * Galaxy S22, Hexagon v69) is verified; other chips fall back to 0 (auto-detect).
    * Extend from the SocModel enum in the QNN SDK's QnnHtpDevice.h.
    */
   private static int mapSoc(String m) {
     if (m == null) return 0;
     switch (m.toUpperCase()) {
-      case "SM8450": return 36;   // verified: Snapdragon 8 Gen 1, Hexagon v73
+      case "SM8450": return 36;   // verified: Snapdragon 8 Gen 1, Hexagon v69
       default:       return 0;    // let the HTP detect the online device
     }
   }

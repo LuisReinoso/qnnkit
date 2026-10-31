@@ -60,6 +60,14 @@ public final class Npu {
         cacheFor(c, graphName, path), graphName, SocInfo.detect().qnnSocModel);
   }
 
+  /**
+   * Open a prebuilt context binary (compiled offline for this SoC with the bundled QAIRT
+   * version) as a persistent, multi input/output session. Null if it cannot be loaded.
+   */
+  public static QnnSession openContext(Context c, File contextBinary) {
+    return QnnSession.open(libDir(c), contextBinary, SocInfo.detect().qnnSocModel);
+  }
+
   // --- helpers -------------------------------------------------------------
 
   private static String libDir(Context c) {

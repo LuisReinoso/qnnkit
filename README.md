@@ -79,18 +79,36 @@ keyed by the model file size, so swapping a model file re-finalizes automaticall
 ## SoC support
 
 `SocInfo.detect()` reads `Build.SOC_MODEL` and maps known chips to a QNN SoC id. Only
-`SM8450` (Snapdragon 8 Gen 1, Hexagon v73) is verified today; other Snapdragons fall back
+`SM8450` (Snapdragon 8 Gen 1, Hexagon v69) is verified today; other Snapdragons fall back
 to id `0`, which lets the HTP backend detect the attached chip on-device. To pin a chip
 explicitly, add it to the `mapSoc` table in `SocInfo.java` from the `SocModel` enum in the
 QNN SDK's `QnnHtpDevice.h`.
 
+## Persistent sessions over prebuilt context binaries (0.2.0)
+
+For models called many times in a row (TTS vocoders, Whisper decoders), compile the context
+binary offline for the target SoC with `qnn-context-binary-generator` (same QAIRT version as the
+runtime you bundle) and keep it loaded:
+
+```java
+try (QnnSession dec = Npu.openContext(ctx, new File(dir, "decoder.bin"))) {
+  dec.input("input_ids").asIntBuffer().put(0, token);   // any number of named inputs
+  if (dec.execute()) dec.output("logits").asShortBuffer(); // any number of outputs
+}
+```
+
+- Inputs and outputs are direct `ByteBuffer`s over the tensors' own memory (native order),
+  of any QNN data type: int32, fp32, fp16 (as AI Hub exports), uint8...
+- One backend + device is shared by all sessions in the process; each `execute()` only runs
+  the graph. `QnnSession.setBurst(true/false)` votes the HTP clocks around a burst of work.
+- `QnnSession.lastError()` says which QNN step failed and with which error code.
+- Load is a memory map of the file, so hundreds of MB do not pass through the Java heap.
+
 ## Scope and limits
 
-- One input tensor and one output tensor per `run` (the common single-head case). Multi
-  input/output is not wired yet.
+- `QnnModel.run` (DLC / model .so): one input tensor and one output tensor per call, handles
+  created and freed per call. Use `QnnSession` for multi input/output or repeated calls.
 - arm64-v8a only. Float graphs run in FP16 on the HTP.
-- Handles are created and freed per `run`. That is safe and simple; a persistent session
-  (create once, run many) would cut the per-call device setup and is a natural next step.
 
 ## License
 
